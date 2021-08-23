@@ -1,0 +1,230 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Mysql索引原理 | 沙子豪</title>
+
+<link rel="shortcut icon" href="https://rustysharon.github.io/favicon.ico?v=1629688253501">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://rustysharon.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            沙子豪
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1629688253501" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Mysql索引原理
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-08-01 ·
+                    </time>
+                    
+                </div>
+                <div class="post-content">
+                    <h1 id="1-索引类型">1. 索引类型</h1>
+<p>索引可以提升查询速度，会影响where查询，以及order by排序。MySQL索引类型如下:<br>
+从索引存储结构划分:B Tree索引、Hash索引、FULLTEXT全文索引、R Tree索引 从应用层次划分:普通索引、唯一索引、主键索引、复合索引 从索引键值类型划分:主键索引、辅助索引(二级索引) 从数据存储和索引键值逻辑关系划分:聚集索引(聚簇索引)、非聚集索引(非聚簇索引)<br>
+##1.1 普通索引<br>
+这是最基本的索引类型，基于普通字段建立的索引，没有任何限制。 创建普通索引的方法如下:<br>
+CREATE INDEX &lt;索引的名字&gt; ON tablename (字段名);<br>
+ALTER TABLE tablename ADD INDEX [索引的名字] (字段名); CREATE TABLE tablename ( [...], INDEX [索引的名字] (字段名) );</p>
+<p>##1.2 唯一索引</p>
+<p>与&quot;普通索引&quot;类似，不同的就是:索引字段的值必须唯一，但允许有空值 。在创建或修改表时追加唯一<br>
+约束，就会自动创建对应的唯一索引。<br>
+创建唯一索引的方法如下:<br>
+CREATE UNIQUE INDEX &lt;索引的名字&gt; ON tablename (字段名); ALTER TABLE tablename ADD UNIQUE INDEX [索引的名字] (字段名); CREATE TABLE tablename ( [...], UNIQUE [索引的名字] (字段名) ;</p>
+<p>##1.3 主键索引<br>
+它是一种特殊的唯一索引，不允许有空值。在创建或修改表时追加主键约束即可，每个表只能有一个主<br>
+键。<br>
+创建主键索引的方法如下:<br>
+CREATE TABLE tablename ( [...], PRIMARY KEY (字段名) ); ALTER TABLE tablename ADD PRIMARY KEY (字段名);</p>
+<p>##1.4 复合索引<br>
+单一索引是指索引列为一列的情况，即新建索引的语句只实施在一列上;用户可以在多个列上建立索<br>
+引，这种索引叫做组复合索引(组合索引)。复合索引可以代替多个单一索引，相比多个单一索引复合<br>
+索引所需的开销更小。<br>
+索引同时有两个概念叫做窄索引和宽索引，窄索引是指索引列为1-2列的索引，宽索引也就是索引列超 过2列的索引，设计索引的一个重要原则就是能用窄索引不用宽索引，因为窄索引往往比组合索引更有 效。<br>
+创建组合索引的方法如下:<br>
+CREATE INDEX &lt;索引的名字&gt; ON tablename (字段名1，字段名2...); ALTER TABLE tablename ADD INDEX [索引的名字] (字段名1，字段名2...);</p>
+<p>CREATE TABLE tablename ( [...], INDEX [索引的名字] (字段名1，字段名2...) ); 复合索引使用注意事项:<br>
+何时使用复合索引，要根据where条件建索引，注意不要过多使用索引，过多使用会对更新操作效 率有很大影响。 如果表已经建立了(col1，col2)，就没有必要再单独建立(col1);如果现在有(col1)索引，如果查 询需要col1和col2条件，可以建立(col1,col2)复合索引，对于查询有一定提高。</p>
+<h2 id="15-全文索引">1.5 全文索引</h2>
+<p>查询操作在数据量比较少时，可以使用like模糊查询，但是对于大量的文本数据检索，效率很低。如果 使用全文索引，查询速度会比like快很多倍。在MySQL 5.6 以前的版本，只有MyISAM存储引擎支持全 文索引，从MySQL 5.6开始MyISAM和InnoDB存储引擎均支持。<br>
+创建全文索引的方法如下:<br>
+CREATE FULLTEXT INDEX &lt;索引的名字&gt; ON tablename (字段名); ALTER TABLE tablename ADD FULLTEXT [索引的名字] (字段名); CREATE TABLE tablename ( [...], FULLTEXT KEY [索引的名字] (字段名) ;</p>
+<p>#2.索引原理</p>
+<h2 id="21hash结构">2.1Hash结构</h2>
+<p>Hash底层实现是由Hash表来实现的，是根据键值 &lt;key,value&gt; 存储数据的结构。非常适合根据key查找<br>
+value值，也就是单个key查询，或者说等值查询。其结构如下所示:<br>
+<img src="https://rustysharon.github.io/post-images/1629646515529.png" alt="" loading="lazy"></p>
+<p>从上面结构可以看出，Hash索引可以方便的提供等值查询，但是对于范围查询就需要全表扫描了。 Hash索引在MySQL 中Hash结构主要应用在Memory原生的Hash索引 、InnoDB 自适应哈希索引。<br>
+InnoDB提供的自适应哈希索引功能强大，接下来重点描述下InnoDB 自适应哈希索引。<br>
+InnoDB自适应哈希索引是为了提升查询效率，InnoDB存储引擎会监控表上各个索引页的查询，当 InnoDB注意到某些索引值访问非常频繁时，会在内存中基于B+Tree索引再创建一个哈希索引，使得内 存中的 B+Tree 索引具备哈希索引的功能，即能够快速定值访问频繁访问的索引页。<br>
+InnoDB自适应哈希索引:在使用Hash索引访问时，一次性查找就能定位数据，等值查询效率要优于 B+Tree。<br>
+自适应哈希索引的建立使得InnoDB存储引擎能自动根据索引页访问的频率和模式自动地为某些热点页 建立哈希索引来加速访问。另外InnoDB自适应哈希索引的功能，用户只能选择开启或关闭功能，无法 进行人工干涉。</p>
+<h2 id="22-b-tree-结构">2.2 B+ Tree 结构</h2>
+<p>MySQL数据库索引采用的是B+Tree结构，在B-Tree结构上做了优化改造。<br>
+B-Tree结构<br>
+索引值和data数据分布在整棵树结构中 每个节点可以存放多个索引值及对应的data数据 树节点中的多个索引值从左到右升序<br>
+<img src="https://rustysharon.github.io/post-images/1629646607719.png" alt="" loading="lazy"><br>
+B树的搜索:从根节点开始，对节点内的索引值序列采用二分法查找，如果命中就结束查找。没有 命中会进入子节点重复查找过程，直到所对应的的节点指针为空，或已经是叶子节点了才结束。<br>
+B+Tree结构：<br>
+<img src="https://rustysharon.github.io/post-images/1629646618649.png" alt="" loading="lazy"></p>
+<p>相比B树，B+树进行范围查找时，只需要查找定位两个节点的索引值，然后利用叶子节点的指针进 行遍历即可。而B树需要遍历范围内所有的节点和数据，显然B+Tree效率高。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://rustysharon.github.io/post/redis-huan-cun-chuan-tou-jie-jue-si-lu/" class="post-title gt-a-link">
+                    Redis缓存穿透解决思路
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">许求聪慧者，童稚捧应癫。</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">sharon</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://rustysharon.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

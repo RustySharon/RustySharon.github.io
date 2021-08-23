@@ -1,0 +1,258 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>RocketMQ 入门二 消息 | 沙子豪</title>
+
+<link rel="shortcut icon" href="https://rustysharon.github.io/favicon.ico?v=1629688253501">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://rustysharon.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            沙子豪
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1629688253501" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    RocketMQ 入门二 消息
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-05-11 ·
+                    </time>
+                    
+                </div>
+                <div class="post-content">
+                    <h1 id="1-环境搭建">1. 环境搭建</h1>
+<ol>
+<li>下载rocketmq</li>
+</ol>
+<blockquote>
+<p>#下载<br>
+wgethttps://archive.apache.org/dist/rocketmq/4.5.1/ocketmq-all4.5.1-bin-release.zip</p>
+</blockquote>
+<h1 id="2-启动nameserver">2. 启动NameServer</h1>
+<pre><code class="language-shell"># 1.启动NameServer
+mqnamesrv
+# 2.查看启动日志
+tail -f ~/logs/rocketmqlogs/namesrv.log
+</code></pre>
+<h1 id="3启动broker">3.启动Broker</h1>
+<pre><code class="language-shell"># 1.启动Broker
+mqbroker -n localhost:9876
+# 2.查看启动日志
+tail -f ~/logs/rocketmqlogs/broker.log
+</code></pre>
+<h1 id="4rocketmq相关api使用">4.RocketMQ相关API使用</h1>
+<p>DefaultMQProducer 生产者的默认实现 生产消息分同步发送和异步发送 DefaultMQConsumer:消费者的默认实现 消息的拉取和消息的推送</p>
+<p>消息生产者：</p>
+<pre><code class="language-java">public class MyProducer {
+    public static void main(String[] args) throws
+UnsupportedEncodingException, InterruptedException, RemotingException,
+MQClientException, MQBrokerException {
+// 在实例化生产者的同时，指定了生产组名称
+        DefaultMQProducer producer = new
+DefaultMQProducer(&quot;myproducer_grp_01&quot;);
+// 指定NameServer的地址 producer.setNamesrvAddr(&quot;node1:9876&quot;);
+// 对生产者进行初始化，然后就可以使用了 producer.start();
+MyAsyncProducer.java
+
+// 创建消息，第一个参数是主题名称，第二个参数是消息内容 Message message = new Message(
+                &quot;tp_demo_01&quot;,
+                &quot;hello lagou 01&quot;.getBytes(RemotingHelper.DEFAULT_CHARSET)
+);
+// 发送消息
+final SendResult result = producer.send(message); System.out.println(result);
+// 关闭生产者
+        producer.shutdown();
+    }
+}
+</code></pre>
+<p>消息消费者：</p>
+<pre><code class="language-java">public class MyAsyncProducer {
+    public static void main(String[] args) throws MQClientException,
+UnsupportedEncodingException, RemotingException, InterruptedException { // 实例化生产者，并指定生产组名称
+        DefaultMQProducer producer = new
+DefaultMQProducer(&quot;producer_grp_01&quot;);
+// 指定nameserver的地址 producer.setNamesrvAddr(&quot;node1:9876&quot;);
+// 初始化生产者 producer.start();
+        for (int i = 0; i &lt; 100; i++) {
+            Message message = new Message(
+                    &quot;tp_demo_02&quot;,
+                    (&quot;hello lagou &quot; + i).getBytes(&quot;utf-8&quot;)
+);
+// 消息的异步发送
+producer.send(message, new SendCallback() {
+@Override
+                public void onSuccess(SendResult sendResult) {
+MyPullConsumer.java
+
+System.out.println(&quot;发送成功:&quot; + sendResult); }
+@Override
+public void onException(Throwable throwable) { System.out.println(&quot;发送失败:&quot; +
+throwable.getMessage());
+                }
+}); }
+// 由于是异步发送消息，上面循环结束之后，消息可能还没收到broker的响应 // 如果不sleep一会儿，就报错
+Thread.sleep(10_000);
+// 关闭生产者
+        producer.shutdown();
+    }
+}
+</code></pre>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://rustysharon.github.io/post/rocketmq-ru-men-yi/" class="post-title gt-a-link">
+                    RocketMQ 入门一
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">许求聪慧者，童稚捧应癫。</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">sharon</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://rustysharon.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

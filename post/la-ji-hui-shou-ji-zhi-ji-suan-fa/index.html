@@ -1,0 +1,219 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>垃圾回收机制及算法 | 沙子豪</title>
+
+<link rel="shortcut icon" href="https://rustysharon.github.io/favicon.ico?v=1629688253501">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://rustysharon.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            沙子豪
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1629688253501" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    垃圾回收机制及算法
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-06-20 ·
+                    </time>
+                    
+                </div>
+                <div class="post-content">
+                    <h1 id="1-对象是否已死">1. 对象是否已死</h1>
+<figure data-type="image" tabindex="1"><img src="https://rustysharon.github.io/post-images/1629645819344.png" alt="" loading="lazy"></figure>
+<h2 id="11引用计数算法">1.1引用计数算法</h2>
+<p>引用计数算法可以这样实现:给每个创建的对象添加一个引用计数器，每当此对象被某个地方引用时，计数值+1， 引用失效时-1，所以当计数值为0时表示对象已经不能被使用。引用计数算法大多数情况下是个比较不错的算法， 简单直接，也有一些著名的应用案例但是对于Java虚拟机来说，并不是一个好的选择，因为它很难解决对象直接相 互循环引用的问题。</p>
+<h2 id="12可达性分析算法">1.2可达性分析算法</h2>
+<p>在主流的商用程序语言如Java、C#等的主流实现中，都是通过可达性分析(Reachability Analysis)来判断对象是否存 活的。此算法的基本思路就是通过一系列的“GC Roots”的对象作为起始点，从起始点开始向下搜索到对象的路径。 搜索所经过的路径称为引用链(Reference Chain)，当一个对象到任何GC Roots都没有引用链时，则表明对象“不可 达” ，即该对象是不可用的。<br>
+<img src="https://rustysharon.github.io/post-images/1629645488344.png" alt="" loading="lazy"></p>
+<p>在Java语言中，可作为GC Roots的对象包括下面几种:<br>
+栈帧中的局部变量表中的reference引用所引用的对象<br>
+方法区中static静态引用的对象<br>
+方法区中final常量引用的对象<br>
+本地方法栈中JNI(Native方法)引用的对象<br>
+Java虚拟机内部的引用， 如基本数据类型对应的Class对象， 一些常驻的异常对象(比如 NullPointExcepiton、 OutOfMemoryError) 等， 还有系统类加载器。<br>
+所有被同步锁(synchronized关键字) 持有的对象。</p>
+<h1 id="2-垃圾回收算法">2 垃圾回收算法</h1>
+<h2 id="21-标记-清除">2.1 标记-清除</h2>
+<p>最早出现也是最基础的垃圾收集算法是“标记-清除”(Mark-Sweep) 算法， 在1960年由Lisp之父 John McCarthy所 提出。 如它的名字一样， 算法分为“标记”和“清除”两个阶段: 首先标记出所有需要回 收的对象， 在标记完成后， 统一回收掉所有被标记的对象， 也可以反过来， 标记存活的对象， 统一回 收所有未被标记的对象。<br>
+标记过程就是对象是否属于垃圾的判定过程， 这在前一节讲述垃圾对象标记 判定算法时其实已经介绍过了。 之所 以说它是最基础的收集算法， 是因为后续的收集算法大多都是以标记-清除算法为基础， 对其 缺点进行改进而得到 的。<br>
+<img src="https://rustysharon.github.io/post-images/1629645614015.png" alt="" loading="lazy"></p>
+<h2 id="22-标记-复制">2.2 标记-复制</h2>
+<p>了解决标记-清除算法面对大量可回收对象时执行效率低的问题， 1969年Fenichel提出了一种称为“半区复 制”(Semispace Copying) 的垃圾收集算法， 它将可用 内存按容量划分为大小相等的两块， 每次只使用其中的一 块。 当这一块的内存用完了， 就将还存活着 的对象复制到另外一块上面， 然后再把已使用过的内存空间一次清理 掉。 如果内存中多数对象都是存活的， 这种算法将会产生大量的内存间复制的开销， 但对于多数对象都是可回收 的情况， 算法需要复制的就是占少数的存活对象， 而且每次都是针对整个半区进行内存回收， 分配内存时也就不 用考虑有空间碎片的复杂情况， 只要移动堆顶指针， 按顺序分配即可.</p>
+<figure data-type="image" tabindex="2"><img src="https://rustysharon.github.io/post-images/1629645677716.png" alt="" loading="lazy"></figure>
+<h2 id="23-标记-整理">2.3 标记-整理</h2>
+<p>标记-复制算法在对象存活率较高时就要进行较多的复制操作， 效率将会降低。 更关键的是， 如果不想浪费50%的 空间， 就需要有额外的空间进行分配担保， 以应对被使用的内存中所有对象都100%存活的极端情况， 所以在老年 代一般不能直接选用这种算法。<br>
+针对老年代对象的存亡特征， 1974年Edward Lueders提出了另外一种有针对性的“标记-整 理”(Mark-Compact) 算 法， 其中的标记过程仍然与“标记-清除”算法一样， 但后续步骤不是直接对可回收对象进行清理， 而是让所有存活 的对象都向内存空间一端移动， 然后直接清理掉边界以外的内存 。</p>
+<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法， 而后者是移动式的。 是否移动 回收后的存活对象是一项优缺点并存的风险决策:</p>
+<figure data-type="image" tabindex="3"><img src="https://rustysharon.github.io/post-images/1629645686120.png" alt="" loading="lazy"></figure>
+<h1 id="3-垃圾回收器">3 垃圾回收器</h1>
+<h2 id="31-cms">3.1 CMS</h2>
+<p>CMS(concurrent mark sweep)是以获取最短垃圾收集停顿时间为目标的收集器，CMS收集器的关注点尽可能缩短 垃圾收集时用户线程的停顿时间,停顿时间越短就越适合与用户交互的程序,目前很大一部分的java应用几种在互联网 的B/S系统服务器上，这类应用尤其注重服务器的响应速度，系统停顿时间最短，给用户带来良好的体验，CMS收 集器使用的算法是标记-清除算法实现的;<br>
+4.7.2 CMS垃圾收集过程 整个过程分4个步骤: 1)初始标记<br>
+2) 并发标记<br>
+3) 重新标记<br>
+4) 并发清除<br>
+其中 初始标记 和 重新标记 都需要stopTheWorld</p>
+<p>CMS整个过程比之前的收集器要复杂,整个过程分为4个阶段即、初始标记 并发标记 、重新标记、并发清除<br>
+初始标记(Initial-Mark)阶段:这个阶段程序所有的工作线程都将会因为&quot;Stop-the-Wold&quot;机制而出现短暂的的 暂停,这个阶段的主要任务标记处GC Roots 能够关联到的对象.一旦标记完成后就恢复之前被暂停的的所有应 用。 由于直接关联对象比较小，所以这里的操作速度非常快。<br>
+并发标记(Concurrent-Mark)阶段:从GC Roots的直接关联对象开始遍历整个对象图的过程,这个过程耗时较 长,但是不需要暂停用户线程, 用户线程可以与垃圾回收器一起运行。 重新标记(Remark)阶段:由于并发标记阶段，程序的工作线程会和垃圾收集线程同时运行或者交叉运行， 因此，为了修正并发标记期间因为用户继续运行而导致标记产生变动的那一部分对象的标记记录，这个阶段 的停顿时间通常比初始标记阶段长一些，但也远比并发标记阶段时间短。 清除并发(Concurrent-Sweep)阶段: 此阶段清理删除掉标记判断已经死亡的对象,并释放内存空间。由于不需 要移动存活对象，所以这个阶段可以与用户线程同时并发运行。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://rustysharon.github.io/post/rocketmq-ru-men-er-xiao-xi/" class="post-title gt-a-link">
+                    RocketMQ 入门二 消息
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">许求聪慧者，童稚捧应癫。</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">sharon</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://rustysharon.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

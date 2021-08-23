@@ -1,0 +1,208 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>RocketMQ 入门一 | 沙子豪</title>
+
+<link rel="shortcut icon" href="https://rustysharon.github.io/favicon.ico?v=1629688253501">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://rustysharon.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            沙子豪
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1629688253501" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    RocketMQ 入门一
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-03-09 ·
+                    </time>
+                    
+                </div>
+                <div class="post-content">
+                    <h1 id="1-消息队列应用场景">1. 消息队列应用场景</h1>
+<p>应用解耦：<br>
+系统的耦合性越高，容错性就越低。以电商应用为例，用户创建订单后，如果耦合调用库存系统、<br>
+物流系统、支付系统，任何一个子系统出了故障或者因为升级等原因暂时不可用，都会造成下单操作异<br>
+常，影响用户使用体验。<br>
+流量削峰：<br>
+应用系统如果遇到系统请求流量的瞬间猛增，有可能会将系统压垮。有了消息队列可以将大量请求<br>
+缓存起来，分散到很长一段时间处理，这样可以大大提到系统的稳定性和用户体验。<br>
+举例:业务系统正常时段的QPS如果是1000，流量最高峰是10000，为了应对流量高峰配置高性能 的服务器显然不划算，这时可以使用消息队列对峰值流量削峰<br>
+数据分发：<br>
+通过消息队列可以让数据在多个系统之间进行流通。数据的产生方不需要关心谁来使用数据，只需<br>
+要将数据发送到消息队列，数据使用方直接在消息队列中直接获取数据即可</p>
+<h1 id="2基本架构">2.基本架构</h1>
+<p>RocketMQ的角色介绍<br>
+Producer:消息的发送者;举例:发信者<br>
+Consumer:消息接收者;举例:收信者<br>
+Broker:暂存和传输消息;举例:邮局 NameServer:管理Broker;举例:各个邮局的管理机构 Topic:区分消息的种类;一个发送者可以发送消息给一个或者多个Topic;一个消息的接收者 可以订阅一个或者多个Topic消息<br>
+Message Queue:相当于是Topic的分区;用于并行发送和接收消息<br>
+<img src="https://rustysharon.github.io/post-images/1629648309313.png" alt="" loading="lazy"></p>
+<p>执行流程:</p>
+<ol>
+<li>启动NameServer，NameServer起来后监听端口，等待Broker、Producer、Consumer连上 来，相当于一个路由控制中心。</li>
+<li>Broker启动，跟所有的NameServer保持长连接，定时发送心跳包。心跳包中包含当前 Broker信息(IP+端口等)以及存储所有Topic信息。注册成功后，NameServer集群中就有Topic 跟Broker的映射关系。</li>
+<li>收发消息前，先创建Topic，创建Topic时需要指定该Topic要存储在哪些Broker上，也可以在 发送消息时自动创建Topic。</li>
+<li>Producer发送消息，启动时先跟NameServer集群中的其中一台建立长连接，并从 NameServer中获取当前发送的Topic存在哪些Broker上，轮询从队列列表中选择一个队列， 然后与队列所在的Broker建立长连接从而向Broker发消息。</li>
+<li>Consumer跟Producer类似，跟其中一台NameServer建立长连接，获取当前订阅Topic存在 哪些Broker上，然后直接跟Broker建立连接通道，开始消费消息</li>
+</ol>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://rustysharon.github.io/post/netty-nian-bao-yu/" class="post-title gt-a-link">
+                    Netty 粘包与拆包
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">许求聪慧者，童稚捧应癫。</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">sharon</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://rustysharon.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

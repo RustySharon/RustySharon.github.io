@@ -1,0 +1,224 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>大厂面试40问 | 沙子豪</title>
+
+<link rel="shortcut icon" href="https://rustysharon.github.io/favicon.ico?v=1629688253501">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://rustysharon.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            沙子豪
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1629688253501" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    大厂面试40问
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-08-23 ·
+                    </time>
+                    
+                </div>
+                <div class="post-content">
+                    <p>大厂面试总结，面到怀疑人生</p>
+<!--more-->
+<p>1、秒杀项目是完全你自己做的？<br>
+2、能详细介绍一下接口优化吗？<br>
+3、关于分布式session，你用redis存储，是用的持久化的吗，还是非持久化的？<br>
+4、如果是非持久化的，那你的超时时间怎么讲？怎么设置的？<br>
+5、那你给我讲一下redis吧，你对redis的理解<br>
+6、你提到了主从复制、哨兵模式，能给我讲一下这一块吗？<br>
+7、它是增强读还是增强读写？<br>
+8、哨兵模式呢？<br>
+9、我看你项目里也用到了消息系统，那在你的秒杀系统场景下，你是怎么用的消息的？<br>
+10、如果说这台消息的broker（服务端）挂了呢？就是你刚才写的那个节点挂了呢，怎么办？<br>
+11、消息一直重发，它的压力不会很大吗？<br>
+12、对于这种问题，rabbitmq和kafka你知道它们是怎么解决的吗？<br>
+13、刚才你提到把消息写到多个节点，那写多个节点怎么做呢？<br>
+14、要保证多个节点的一致性，要怎么做呢？<br>
+15、这个时候消费者端该如何消费呢？<br>
+16、介绍一下nacos这一块吧<br>
+17、刚刚你提到，zookeeper可用性差一点，那它可用性差在哪里？<br>
+18、以两个机房为例，讲一讲nacos可用性为什么高、zookeeper为什么低？<br>
+19、zookeeper是两个机房都不可用吗？<br>
+20、zk其实是用的类似raft协议，你可以讲一下吗？或者就讲nacos的。<br>
+21、断网以后，两个节点这边能接受写的请求吗？<br>
+22、你能讲一下Distro协议吗？<br>
+23、服务被A转发到对应的负责节点B，之后B会做哪些事情？<br>
+24、B节点如何同步服务到其他节点？（什么策略）<br>
+25、hash并取余是寻找server还是同步的时候做的？<br>
+26、nacos配置管理这方面了解吗？<br>
+27、nacos前一段时间发布了2.0版本，有关注吗?<br>
+28、你有用过2.0吗？<br>
+29、jvm里的一些GC的过程，分代收集之类的能介绍一下吗？<br>
+30、平常会用哪类的垃圾回收器？配置会用哪个？<br>
+31、那你知道CMS或者G1这种吗？<br>
+32、CMS你没有用过对吧，你只是知道它的原理<br>
+33、你有没有处理过full gc的问题？<br>
+34、算法方面，分布式的一些算法你了解吗？比如说一致性hash算法。<br>
+35、那一致性hash算法是解决什么问题呢？或者说它有什么优势？你刚才说的这么多，它这样做的原因是什么？36、关于TCP方面，你介绍一下三次握手呗？<br>
+37、那关于tcp上面的滑动窗口，你有了解吗？<br>
+38、专业方面做过的项目能介绍一下吗？不用说实现细节，可以讲一下团队协同之类的。<br>
+39、为什么不继续做你现在的专业方向呢？为什么不继续做这个行业？<br>
+40、你未来两到三年的职业规划是什么样的？<br>
+41、现在不管是中间件还是云容器，都逐渐在往云原生在走，你对云原生是怎么理解的？<br>
+42、刚刚说的可能更偏向云计算，那云原生呢？</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://rustysharon.github.io/post/mysql-shi-wu-acid/" class="post-title gt-a-link">
+                    Mysql 事务ACID特性
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">许求聪慧者，童稚捧应癫。</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">sharon</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://rustysharon.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>
